@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical Chatbot</title>
+
+  <!-- Bootstrap -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .chat {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .card {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .msg_head {
+      background: #4e73df;
+      color: white;
+      padding: 15px;
+    }
+
+    .msg_head .user_info span {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .msg_head .user_info p {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .msg_card_body {
+      background: #f7f9fc;
+      height: 450px;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .card-footer {
+      background: white;
+      border-top: none;
+      padding: 15px;
+    }
+
+    .type_msg {
+      border: none;
+      border-radius: 30px;
+      padding: 12px 20px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .send_btn {
+      background: #4e73df;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      padding: 12px;
+      margin-left: 10px;
+      transition: background 0.3s;
+    }
+
+    .send_btn:hover {
+      background: #2e59d9;
+    }
+
+    .msg_cotainer, .msg_cotainer_send {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 10px 15px;
+      position: relative;
+      margin-bottom: 15px;
+      max-width: 75%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 15px;
+    }
+
+    .msg_cotainer_send {
+      background: #4e73df;
+      color: white;
+    }
+
+    .msg_time, .msg_time_send {
+      position: absolute;
+      bottom: -18px;
+      font-size: 11px;
+      opacity: 0.6;
+    }
+
+    .msg_time { left: 0; }
+    .msg_time_send { right: 0; }
+
+    .img_cont_msg img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat">
+    <div class="card">
+      <!-- Header -->
+      <div class="card-header msg_head d-flex align-items-center">
+        <div class="img_cont">
+          <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle" width="45">
+        </div>
+        <div class="user_info ml-3">
+          <span>Medical Chatbot</span>
+          <p>Ask me anything</p>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div id="messageFormeight" class="card-body msg_card_body"></div>
+
+      <!-- Input -->
+      <div class="card-footer">
+        <form id="messageArea" class="d-flex">
+          <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
+          <button type="submit" id="send" class="send_btn"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $("#messageArea").on("submit", function(event) {
+        const date = new Date();
+        const hour = date.getHours();
+        const minute = date.getMinutes();
+        const str_time = hour+":"+minute;
+        var rawText = $("#text").val();
+
+        var userHtml = '<div class="d-flex justify-content-end align-items-end">' +
+                       '<div class="msg_cotainer_send">' + rawText +
+                       '<span class="msg_time_send">'+ str_time + '</span></div>' +
+                       '<div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png"></div></div>';
+
+        $("#text").val("");
+        $("#messageFormeight").append(userHtml);
+        $("#messageFormeight").scrollTop($("#messageFormeight")[0].scrollHeight);
+
+        $.ajax({
+          data: { msg: rawText },
+          type: "POST",
+          url: "/get",
+        }).done(function(data) {
+          var botHtml = '<div class="d-flex justify-content-start align-items-end">' +
+                        '<div class="img_cont_msg"><img src="https://cdn-icons-png.flaticon.com/512/387/387569.png"></div>' +
+                        '<div class="msg_cotainer">' + data +
+                        '<span class="msg_time">' + str_time + '</span></div></div>';
+          $("#messageFormeight").append($.parseHTML(botHtml));
+          $("#messageFormeight").scrollTop($("#messageFormeight")[0].scrollHeight);
+        });
+        event.preventDefault();
+      });
+    });
+  </script>
+</body>
+</html>

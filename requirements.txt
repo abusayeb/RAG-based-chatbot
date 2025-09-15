@@ -3,7 +3,9 @@ flask == 3.1.1
 pypdf == 5.6.1
 python-dotenv == 1.1.0
 langchain-pinecone==0.2.8
-langchain-openai==0.3.24
 langchain-community==0.3.26
+openai
+azure-identity==1.20.0
+ansible-core==2.17.0
 
 -e .
